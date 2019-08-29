@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.monitoring.mapper.WaveMapper">
+
+	<resultMap id = "result_chart_data_a" type = "nms.monitoring.vo.WaveChartDataVO" >
+		<result property = "label" column = "label"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "pga_z" column = "st_pga_z"/>
+		<result property = "pga_n" column = "st_pga_n"/>
+		<result property = "pga_e" column = "st_pga_e"/>
+		<result property = "pga_2d" column = "st_pga_2d"/>
+		<result property = "pga_3d" column = "st_pga_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_chart_data_b" type = "nms.monitoring.vo.WaveChartDataVO">
+		<result property = "label" column = "label"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "pga_z" column = "st_pga_z"/>
+		<result property = "pga_n" column = "st_pga_n"/>
+		<result property = "pga_e" column = "st_pga_e"/>
+		<result property = "pga_2d" column = "st_pga_2d"/>
+		<result property = "pga_3d" column = "st_pga_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_chart_data_c" type = "nms.monitoring.vo.WaveChartDataVO">
+		<result property = "label" column = "label"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "pga_z" column = "st_pga_z"/>
+		<result property = "pga_n" column = "st_pga_n"/>
+		<result property = "pga_e" column = "st_pga_e"/>
+		<result property = "pga_2d" column = "st_pga_2d"/>
+		<result property = "pga_3d" column = "st_pga_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_chart_data_d" type = "nms.monitoring.vo.WaveChartDataVO">
+		<result property = "label" column = "label"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "pga_z" column = "st_pga_z"/>
+		<result property = "pga_n" column = "st_pga_n"/>
+		<result property = "pga_e" column = "st_pga_e"/>
+		<result property = "pga_2d" column = "st_pga_2d"/>
+		<result property = "pga_3d" column = "st_pga_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_chart_data_g" type = "nms.monitoring.vo.WaveChartDataVO">
+		<result property = "label" column = "label"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "pga_z" column = "st_pga_z"/>
+		<result property = "pga_n" column = "st_pga_n"/>
+		<result property = "pga_e" column = "st_pga_e"/>
+		<result property = "pga_2d" column = "st_pga_2d"/>
+		<result property = "pga_3d" column = "st_pga_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_map_data" type="nms.monitoring.vo.WaveMapDataVO">
+		<result property="tablename" column = "tablename"/>
+		<result property="st_epochtime" column = "st_epochtime"/>
+		<result property="pga_val" column = "pga_val"/>
+		<result property="color" column = "color"/>
+		<result property="maptype" column = "maptype"/>
+		<result property="sen_rep" column = "sen_rep"/>
+	</resultMap>
+	
+	<resultMap id = "result_event_list" type = "nms.quakeoccur.vo.SelfEventListVO" >
+		<result property="no" column="evt_no"/>
+		<result property="timestamp" column="evt_timestamp"/>
+		<result property="epochtime" column="evt_epochtime"/>
+		<result property="org" column="evt_org"/>
+		<result property="station" column="evt_station"/>
+		<result property="location" column="evt_location"/>
+		<result property="z" column="evt_z"/>
+		<result property="n" column="evt_n"/>
+		<result property="e" column="evt_e"/>
+		<result property="twod" column="evt_2d"/>
+		<result property="threed" column="evt_3d"/>
+	</resultMap>
+	
+	<resultMap id = "result_chart_label" type = "nms.monitoring.vo.WaveChartDataVO">
+		<result property = "label" column = "label"/>
+	</resultMap>
+
+	<select id="staTypeByDatas" resultMap = "result_chart_data_a,  result_chart_data_b, result_chart_data_c, result_chart_data_d, result_chart_data_g, result_chart_label" statementType="CALLABLE" >
+		{Call SP_CHART_DATA(#{dataType}, #{staType})}
+	</select>
+	
+	<select id="mapDatas" resultMap = "result_map_data" statementType="CALLABLE">
+		{Call SP_WAVE_MAP_DATA(#{type})}
+	</select>
+	
+	<select id="chartDatas" resultMap = "result_chart_data_a" statementType="CALLABLE">
+		{Call SP_CHART_DATA_NEW(#{staType})}
+	</select>
+	
+	<select id="alarmDatas" resultMap = "result_event_list">
+		SELECT  evt_no,		evt_timestamp,	evt_epochtime,
+				evt_org,	evt_station,	evt_location,
+				evt_z,		evt_n,			evt_e,
+				evt_2d,		evt_3d
+			FROM seis_event_alarm
+			WHERE evt_alarmyn = 'N'
+	</select>
+	
+	<update id="endAlarm" parameterType="java.lang.String">
+		UPDATE seis_event_alarm SET evt_alarmyn = 'Y'
+			WHERE evt_no = #{evtNo}
+	</update>
+	
+</mapper>

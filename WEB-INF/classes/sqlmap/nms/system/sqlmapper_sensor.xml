@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.SensorMapper">
+	<select id="getSensorList" resultType="nms.system.vo.SensorVO">
+		SELECT 
+			sen_no, 
+			sta_no, 
+			net, 
+			obs_id, 
+			sen_id, 
+			sen_location, 
+			sen_company, 
+			sen_model, 
+			sen_serial, 
+			sen_kind, 
+		    s1.codeDesc as sen_kind_desc,
+			sen_gubun, 
+		    s2.codeDesc as sen_gubun_desc,
+			sen_position, 
+			sen_channel, 
+			sen_lon, 
+			sen_lat, 
+			sen_z_resp, 
+			sen_n_resp, 
+			sen_e_resp, 
+			sen_z_sens, 
+			sen_n_sens, 
+			sen_e_sens, 
+			sen_rec_id, 
+			regdate, 
+			sen_pic1, 
+			sen_pic2, 
+			sen_pic3, 
+			sen_pic4, 
+			sen_tmp1, 
+			sen_tmp2, 
+			sen_tmp3
+		FROM seis_web.sensor m
+		left join seis_web.code_desc s1 on s1.codeid=m.sen_kind and s1.maincode='sen_kind'
+		left join seis_web.code_desc s2 on s2.codeid=m.sen_gubun and s2.maincode='sen_gubun'
+		where m.sta_no = #{sta_no}
+	</select>
+	<select id="getSensorLastInsertNo" resultType="int">
+		SELECT max(sta_no) as cnt from sensor
+	</select>
+	<select id="getSensorImages" resultType="nms.system.vo.SensorVO">
+		SELECT
+			sen_pic1,sen_pic2,sen_pic3,sen_pic4
+		FROM seis_web.sensor 
+		WHERE sen_no = #{no}
+	</select>	
+	<select id="getSensorMngList" resultType="nms.system.vo.SensorVO">
+		SELECT 
+			sen_no, 
+			sta_no, 
+			net, 
+			obs_id, 
+			sen_id, 
+			sen_location, 
+			sen_company, 
+			sen_model, 
+			sen_serial, 
+			sen_kind, 
+		    s1.codeDesc as sen_kind_desc,
+			sen_gubun, 
+		    s2.codeDesc as sen_gubun_desc,
+			sen_position, 
+			sen_channel, 
+			sen_lon, 
+			sen_lat, 
+			sen_z_resp, 
+			sen_n_resp, 
+			sen_e_resp, 
+			sen_z_sens, 
+			sen_n_sens, 
+			sen_e_sens, 
+			sen_rec_id, 
+			regdate, 
+			sen_pic1, 
+			sen_pic2, 
+			sen_pic3, 
+			sen_pic4, 
+			sen_tmp1, 
+			sen_tmp2, 
+			sen_tmp3
+		FROM seis_web.sensor_mng m
+		left join seis_web.code_desc s1 on s1.codeid=m.sen_kind and s1.maincode='sen_kind'
+		left join seis_web.code_desc s2 on s2.codeid=m.sen_gubun and s2.maincode='sen_gubun'
+		where m.sen_tmp2 = #{l_no}
+	</select>
+	<select id="getSensorHistoryInfo" resultType="nms.system.vo.SensorVO">
+		SELECT
+			sen_no, sta_no,(select obs_name from station s where s.sta_no = m.sta_no) as obs_name, net, obs_id, sen_id, 
+			sen_location, sen_company, sen_model, sen_serial, 
+			sen_kind, sen_gubun, sen_position, sen_channel, 
+			sen_lon, sen_lat, sen_z_resp, sen_n_resp, sen_e_resp, 
+			sen_z_sens, sen_n_sens, sen_e_sens, sen_rec_id, regdate,
+			sen_pic1, sen_pic2, sen_pic3, sen_pic4, sen_tmp1, sen_tmp2, sen_tmp3		
+		FROM sensor_history m
+		WHERE eh_no = #{searchKeyword}
+	</select>
+	<select id="getSensorMaintenanceList" resultType="nms.system.vo.SensorVO">
+		select sen_tmp2,sen_tmp3 from sensor_history where sen_no = #{sen_no}
+	</select>
+	<select id="getStaType" resultType="nms.system.vo.ObservatoryVO">
+		SELECT
+			sta_type,
+			sta_tmp1
+		FROM station
+		WHERE sta_no = #{sta_no}
+	</select>
+	<insert id="insertSensor">
+		insert into seis_web.sensor values(
+			0,#{sta_no},#{net},#{obs_id},#{sen_id},#{sen_location},#{sen_company},#{sen_model},
+			#{sen_serial},#{sen_kind},#{sen_gubun},#{sen_position},#{sen_channel},#{sen_lon},#{sen_lat},
+			#{sen_z_resp},#{sen_n_resp},#{sen_e_resp},#{sen_z_sens},#{sen_n_sens},#{sen_e_sens},#{sen_rec_id},
+			now(),#{sen_pic1},#{sen_pic2},#{sen_pic3},#{sen_pic4},#{sen_tmp1},#{sen_tmp2},#{sen_tmp3}
+		);
+	</insert>
+	<insert id="insertReportSensor">
+		insert into seis_web.sensor_mng values(
+			0,#{sta_no},#{net},#{obs_id},#{sen_id},#{sen_location},#{sen_company},#{sen_model},
+			#{sen_serial},#{sen_kind},#{sen_gubun},#{sen_position},#{sen_channel},#{sen_lon},#{sen_lat},
+			#{sen_z_resp},#{sen_n_resp},#{sen_e_resp},#{sen_z_sens},#{sen_n_sens},#{sen_e_sens},#{sen_rec_id},
+			now(),#{sen_pic1},#{sen_pic2},#{sen_pic3},#{sen_pic4},#{sen_tmp1},#{sen_tmp2},#{sen_tmp3}
+		);
+	</insert>	
+	<insert id="insertMaintenanceSensor">
+		insert into sensor_history
+		select
+			0,sen_no, sta_no, net, obs_id, sen_id, sen_location, sen_company, sen_model, sen_serial, 
+			sen_kind, sen_gubun, sen_position, sen_channel, sen_lon, sen_lat, sen_z_resp, sen_n_resp, 
+			sen_e_resp, sen_z_sens, sen_n_sens, sen_e_sens, sen_rec_id, now(), sen_pic1, sen_pic2, 
+			sen_pic3, sen_pic4, sen_tmp1,#{msg}, #{date}
+		from sensor
+		where sen_no=#{no}
+	</insert>
+	<update id="updateSensor">
+		update seis_web.sensor set
+			sen_id = #{sen_id},
+			sen_location = #{sen_location},
+			sen_company = #{sen_company},
+			sen_model = #{sen_model},
+			sen_serial = #{sen_serial},
+			sen_kind = #{sen_kind},
+			sen_gubun = #{sen_gubun},
+			sen_position = #{sen_position},
+			sen_channel = #{sen_channel},
+			sen_lon = #{sen_lon},
+			sen_lat = #{sen_lat},
+			sen_z_resp = #{sen_z_resp},
+			sen_n_resp = #{sen_n_resp},
+			sen_e_resp = #{sen_e_resp},
+			sen_z_sens = #{sen_z_sens},
+			sen_n_sens = #{sen_n_sens},
+			sen_e_sens = #{sen_e_sens},
+			sen_rec_id = #{sen_rec_id},
+			sen_pic1 = #{sen_pic1},
+			sen_pic2 = #{sen_pic2},
+			sen_pic3 = #{sen_pic3},
+			sen_pic4 = #{sen_pic4},
+			sen_tmp1 = #{sen_tmp1},
+			sen_tmp2 = #{sen_tmp2},
+			sen_tmp3 =#{sen_tmp3}
+		where
+			sen_no = #{sen_no}
+	</update>
+	<update id="updateReportSensor">
+		update seis_web.sensor_mng set
+			sen_id = #{sen_id},
+			sen_location = #{sen_location},
+			sen_company = #{sen_company},
+			sen_model = #{sen_model},
+			sen_serial = #{sen_serial},
+			sen_kind = #{sen_kind},
+			sen_gubun = #{sen_gubun},
+			sen_position = #{sen_position},
+			sen_channel = #{sen_channel},
+			sen_lon = #{sen_lon},
+			sen_lat = #{sen_lat},
+			sen_z_resp = #{sen_z_resp},
+			sen_n_resp = #{sen_n_resp},
+			sen_e_resp = #{sen_e_resp},
+			sen_z_sens = #{sen_z_sens},
+			sen_n_sens = #{sen_n_sens},
+			sen_e_sens = #{sen_e_sens},
+			sen_rec_id = #{sen_rec_id},
+			sen_pic1 = #{sen_pic1},
+			sen_pic2 = #{sen_pic2},
+			sen_pic3 = #{sen_pic3},
+			sen_pic4 = #{sen_pic4},
+			sen_tmp1 = #{sen_tmp1},
+			sen_tmp2 = #{sen_tmp2},
+			sen_tmp3 =#{sen_tmp3}
+		where
+			sen_no = #{sen_no}
+	</update>	
+	<delete id="deleteSensor">
+		delete from seis_web.sensor where sen_no = #{sen_no}
+	</delete>
+			
+	<delete id="deleteReportSensor">
+		delete from seis_web.sensor_mng where sen_no = #{sen_no}
+	</delete>
+	
+	
+	
+<!-- 	테이블 및 트리거 관련 -->
+
+	<select id="createTableSensorWave">
+		 CREATE TABLE ${tableName} (
+			st_no INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            st_timestamp DATETIME,
+            st_epochtime varchar(15),
+            st_pga_z varchar(15),
+            st_pga_n varchar(15),
+            st_pga_e varchar(15),
+            st_pga_2d varchar(15),
+            st_pga_3d varchar(15),
+            st_cav_z varchar(15),
+            st_cav_n varchar(15),
+            st_cav_e varchar(15),
+            st_cav_2d varchar(15),
+            st_cav_3d varchar(15),
+            st_u_max varchar(15),
+            st_u_min varchar(15),
+            st_u_avg varchar(15),
+            st_n_max varchar(15),
+            st_n_min varchar(15),
+            st_n_avg varchar(15),
+            st_e_max varchar(15),
+            st_e_min varchar(15),
+            st_e_avg varchar(15),
+            st_tmp1 varchar(20),
+            st_tmp2 varchar(20),
+            st_tmp3 varchar(20)
+		);	
+	</select>
+	
+	<insert id="insertSensorData">
+		INSERT INTO ${tableName} values(#{name},'32652','Y',#{pga_val})
+	</insert>
+	
+	<select id="createTriggerSensorWave">
+		CREATE TRIGGER ${triggerName} AFTER INSERT ON ${tableName}
+		FOR EACH ROW
+		BEGIN
+ 			update ${tableName} set st_epochtime = UNIX_TIMESTAMP() - NEW.st_epochtime where tablename = #{name};
+ 		END
+	</select>
+</mapper>

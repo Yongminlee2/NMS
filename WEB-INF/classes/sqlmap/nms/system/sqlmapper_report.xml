@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.ReportMgmtMapper">
+	
+	<select id="getReportList" resultType="nms.system.vo.ReportMgmtVO">
+		SELECT * FROM(
+		SELECT 
+			@rownum := @rownum+1 as l_idx, l_no,l_date, l_sta,l_type,(select obs_name from station s  where s.sta_no = m.l_tmp1) as obs_name,(select sta_tmp1 from station s  where s.sta_no = m.l_tmp1) as obs_kind,
+			CASE l_type WHEN 'RPT_02' THEN '관리대장' ELSE CASE l_type WHEN 'RPT_03' THEN '초기점검' ELSE CASE l_type WHEN 'RPT_04' THEN '정기점검' ELSE '-' END END END l_type_desc,
+			convert((case l_send when '0000-00-00 00:00:00' THEN '미전송' ELSE l_send end ) using utf8) as l_send,case l_recv when '0000-00-00 00:00:00' THEN '' ELSE l_recv end as l_recv,l_writer,
+			l_status as ls,CASE l_status WHEN 0 THEN '전송 실패' ELSE CASE l_status WHEN 1 THEN '완료' ELSE CASE l_status WHEN 2 THEN '완료.' ELSE '' END END END l_status,l_reason,l_tmp1,l_tmp2,l_tmp3 
+		FROM seis_web.r_list m,(select @rownum :=0) as R
+        where date_format(l_date,'%Y-%m-%d') between #{startDate} and #{endDate} 
+<!--         and l_status &lt;&gt; 6 -->
+		order by l_date desc) main
+        order by l_idx
+        limit #{startRow},#{rowsPerPage}
+		
+	</select>
+	
+	<select id="getReportListTotalCnt" resultType="int">
+		SELECT 
+			count(*) as cnt
+		FROM seis_web.r_list
+		where date_format(l_date,'%Y-%m-%d') between #{startDate} and #{endDate} 
+<!-- 		and l_status &lt;&gt; 6 -->
+	</select>	
+	
+	<update id="updateSendTime">
+		UPDATE r_list SET 
+			l_send = now() 
+		WHERE l_no = #{l_no}
+	</update>
+<!-- 	희송 요구로 2018 06 18 변경 (점검일자변경) -->
+	<update id="updateReportDate">
+		UPDATE r_list SET
+			l_date = date_format(#{date},'%Y-%m-%d')
+		WHERE l_no = #{rpt_no}
+	</update>
+	
+	<select id="getMaintenanceReport" resultType="nms.system.vo.MaintenanceReportVO">
+		SELECT
+			rpt_rno,
+			rpt_no,
+			rpt_date,
+			net,
+			obs_id,
+			(select obs_name from station s where s.sta_no = (select l_tmp1 from r_list s where s.l_no = m.rpt_rno)) as obs_name,
+			user_id,
+			q1_1,
+			q1_2,
+			q1_3,
+			q1_4,
+			q2_1,
+			q2_2,
+			q2_3,
+			q2_4,
+			q3_1,
+			q3_2,
+			q4_1,
+			q4_2,
+			q4_3,
+			bigo,
+			result,
+			user_dept,
+			user_duty,
+			user_name,
+			user_tel,
+			(select l_status from r_list s where m.rpt_rno = s.l_no ) as l_status
+		FROM seis_web.rpt4_report m
+		WHERE rpt_rno = #{l_no}
+	</select>
+	
+	<select id="getReport_a" resultType="nms.system.vo.InitReportMainVO">
+		SELECT
+			rpt_no,
+			rpt_date,
+			net,
+			obs_id,
+			(select obs_name from station s where s.sta_no = (select l_tmp1 from r_list s where s.l_no = m.rpt_no)) as obs_name,
+			f_sen_id,
+			f_q1,
+			f_q2_1,
+			f_q2_2,
+			f_q3_1,
+			f_q3_2,
+			r_q9_1,
+			r_q9_2,
+			r_q9_3,
+			r_q9_4,
+			r_q9_5,
+			r_q9_6,
+			r_q9_7,
+			r_q10_1,
+			r_q10_2,
+			r_q10_3,
+			r_q10_4,
+			r_q11_1,
+			r_q11_2,
+			r_q11_3,
+			r_q11_4,
+			r_q12_1,
+			r_q12_2,
+			bigo,
+			result,
+			user_dept,
+			user_duty,
+			user_name,
+			user_tel,
+			(select l_status from r_list s where m.rpt_no = s.l_no ) as l_status
+		FROM seis_web.rpt3_report_a m
+		WHERE rpt_no = #{l_no}
+	</select>
+	
+	<select id="getReport_b" resultType="nms.system.vo.InitReportSensorVO">
+		SELECT
+			rpt_sno,
+			rpt_no,
+			rpt_date,
+			net,
+			obs_id,
+			s_sen_id,
+			s_cnt,
+			s_q1_1,
+			s_q1_2,
+			s_q1_3,
+			s_q1_4,
+			s_q1_5,
+			s_q1_6,
+			s_q2_1,
+			s_q2_2,
+			s_q3_1,
+			s_q3_2
+		FROM seis_web.rpt3_report_b	
+		WHERE rpt_no = #{l_no}
+	</select>
+	
+	<select id="getReport_c" resultType="nms.system.vo.InitReportRecorderVO">
+		SELECT
+			rpt_rno,
+			rpt_no,
+			rpt_date,
+			net,
+			obs_id,
+			r_sen_id,
+			r_cnt,
+			r_q1_1,
+			r_q1_2,
+			r_q2_1,
+			r_q2_2,
+			r_q3_1,
+			r_q3_2,
+			r_q4_1,
+			r_q4_2,
+			r_q4_3,
+			r_q5_1,
+			r_q5_2,
+			r_q5_3,
+			r_q6_1,
+			r_q6_2,
+			r_q7,
+			r_q8
+		FROM seis_web.rpt3_report_c		
+		WHERE rpt_no = #{l_no}
+	</select>
+	
+	<select id="insertReport" resultType="int">
+		call SP_INSERT_REPORT(#{l_type},#{user_id},#{sta_no});
+	</select>
+	<select id="deleteNUpdateReport">
+		call SP_UPDATE_N_DELETE_REPORT(#{l_type},#{act},#{l_no})
+	</select>
+	
+	
+	<update id="updateMaintenance" parameterType="nms.system.vo.MaintenanceReportVO">
+		UPDATE seis_web.rpt4_report SET
+			q1_1      = #{q1_1},
+			q1_2      = #{q1_2},
+			q1_3      = #{q1_3},
+			q1_4      = #{q1_4},
+			q2_1      = #{q2_1},
+			q2_2      = #{q2_2},
+			q2_3      = #{q2_3},
+			q2_4      = #{q2_4},
+			q3_1      = #{q3_1},
+			q3_2      = #{q3_2},
+			q4_1      = #{q4_1},
+			q4_2      = #{q4_2},
+			q4_3      = #{q4_3},
+			bigo      = #{bigo},
+			result    = #{result},
+			user_dept = #{user_dept},
+			user_duty = #{user_duty},
+			user_name = #{user_name},
+			user_tel   = #{user_tel},
+			rpt_date =  date_format(#{rpt_date},'%Y-%m-%d')
+		WHERE rpt_rno = #{rpt_rno}
+	</update>
+	
+	<update id="updateInitReport_A" parameterType="nms.system.vo.InitReportMainVO">
+		UPDATE seis_web.rpt3_report_a SET
+			f_q1      = #{f_q1      },
+			f_q2_1    = #{f_q2_1    },
+			f_q2_2    = #{f_q2_2    },
+			f_q3_1    = #{f_q3_1    },
+			f_q3_2    = #{f_q3_2    },
+			r_q9_1    = #{r_q9_1    },
+			r_q9_2    = #{r_q9_2    },
+			r_q9_3    = #{r_q9_3    },
+			r_q9_4    = #{r_q9_4    },
+			r_q9_5    = #{r_q9_5    },
+			r_q9_6    = #{r_q9_6    },
+			r_q9_7    = #{r_q9_7    },
+			r_q10_1   = #{r_q10_1   },
+			r_q10_2   = #{r_q10_2   },
+			r_q10_3   = #{r_q10_3   },
+			r_q10_4   = #{r_q10_4   },
+			r_q11_1   = #{r_q11_1   },
+			r_q11_2   = #{r_q11_2   },
+			r_q11_3   = #{r_q11_3   },
+			r_q11_4   = #{r_q11_4   },
+			r_q12_1   = #{r_q12_1   },
+			r_q12_2   = #{r_q12_2   },
+			bigo      = #{bigo      },
+			result    = #{result    },
+			user_dept = #{user_dept },
+			user_duty = #{user_duty },
+			user_name = #{user_name },
+			user_tel  = #{user_tel  },
+			rpt_date = date_format(#{rpt_date},'%Y-%m-%d')
+		WHERE rpt_no = #{rpt_no}
+	</update>
+	
+	<insert id="insertInitReport_B" parameterType="nms.system.vo.InitReportSensorVO">
+		INSERT INTO seis_web.rpt3_report_b 
+		SELECT '0',l_no,l_date, #{net},#{obs_id},#{s_sen_id},#{s_cnt},#{s_q1_1},#{s_q1_2},#{s_q1_3},#{s_q1_4},#{s_q1_5},#{s_q1_6},#{s_q2_1},#{s_q2_2},#{s_q3_1},#{s_q3_2} FROM r_list where l_no=#{rpt_no}
+	</insert>
+
+	<insert id="insertInitReport_C" parameterType="nms.system.vo.InitReportRecorderVO">
+		INSERT INTO seis_web.rpt3_report_c 
+		SELECT '0',l_no,l_date, #{net},#{obs_id},#{r_sen_id},#{r_cnt},#{r_q1_1},#{r_q1_2},#{r_q2_1},#{r_q2_2},#{r_q3_1},#{r_q3_2},#{r_q4_1},#{r_q4_2},#{r_q4_3},#{r_q5_1},#{r_q5_2},#{r_q5_3},#{r_q6_1},#{r_q6_2},#{r_q7},#{r_q8} FROM r_list where l_no=#{rpt_no}
+	</insert>
+	
+	<update id="updateInitReport_B" parameterType="nms.system.vo.InitReportSensorVO">
+		UPDATE seis_web.rpt3_report_b SET
+			s_cnt   = #{s_cnt},
+			s_q1_1  = #{s_q1_1},
+			s_q1_2  = #{s_q1_2},
+			s_q1_3  = #{s_q1_3},
+			s_q1_4  = #{s_q1_4},
+			s_q1_5  = #{s_q1_5},
+			s_q1_6  = #{s_q1_6},
+			s_q2_1  = #{s_q2_1},
+			s_q2_2  = #{s_q2_2},
+			s_q3_1  = #{s_q3_1},
+			s_q3_2  = #{s_q3_2},
+			rpt_date = date_format(#{rpt_date},'%Y-%m-%d')
+		WHERE rpt_sno = #{rpt_sno}
+	</update>
+	
+	<update id="updateInitReport_C"  parameterType="nms.system.vo.InitReportRecorderVO">
+		UPDATE seis_web.rpt3_report_c SET
+			r_cnt    = #{r_cnt  },
+			r_q1_1   = #{r_q1_1 },
+			r_q1_2   = #{r_q1_2 },
+			r_q2_1   = #{r_q2_1 },
+			r_q2_2   = #{r_q2_2 },
+			r_q3_1   = #{r_q3_1 },
+			r_q3_2   = #{r_q3_2 },
+			r_q4_1   = #{r_q4_1 },
+			r_q4_2   = #{r_q4_2 },
+			r_q4_3   = #{r_q4_3 },
+			r_q5_1   = #{r_q5_1 },
+			r_q5_2   = #{r_q5_2 },
+			r_q5_3   = #{r_q5_3 },
+			r_q6_1   = #{r_q6_1 },
+			r_q6_2   = #{r_q6_2 },
+			r_q7     = #{r_q7   },
+			r_q8     = #{r_q8   },
+			rpt_date = date_format(#{rpt_date},'%Y-%m-%d')
+		WHERE rpt_rno = #{rpt_rno}
+	</update>
+	
+	<delete id="deleteInitReport_B">
+		DELETE FROM seis_web.rpt3_report_b where rpt_sno=#{rpt_sno}
+	</delete>
+	
+	<delete id="deleteInitReport_C">
+		DELETE FROM seis_web.rpt3_report_c where rpt_rno=#{rpt_rno}
+	</delete>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<decorators defaultdir="/WEB-INF/jsp">
+  	<excludes>
+		<pattern>**/validate.*</pattern>
+		<pattern>/doc/*</pattern>
+		<pattern>/login*</pattern>
+		<pattern>/logout*</pattern>
+  	</excludes>
+  	
+	<decorator name="main" page="decorator/layout-main.jsp">
+		<pattern>/</pattern>
+		<pattern>/main</pattern>
+		<pattern>/index</pattern>
+	</decorator>
+	<decorator name="sub" page="decorator/layout-sub.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+	<decorator name="popup" page="decorator/layout-defult.jsp">
+		<pattern>**/popup*</pattern>
+	</decorator>	
+</decorators>

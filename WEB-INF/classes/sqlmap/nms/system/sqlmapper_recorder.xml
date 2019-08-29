@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.RecorderMapper">
+
+	<select id="getRecorderList" resultType="nms.system.vo.RecorderVO">
+		select
+			rec_no, 
+		    sta_no, 
+		    net, 
+		    obs_id, 
+		    rec_id, 
+		    rec_company, 
+		    rec_model, 
+		    rec_serial, 
+		    warrenty, 
+		    wformat, 
+		    protocol, 
+		    regdate, 
+		    rec_pic1, 
+		    rec_pic2, 
+		    rec_pic3, 
+		    rec_pic4, 
+		    rec_tmp1, 
+		    rec_tmp2, 
+		    rec_tmp3
+		from seis_web.recorder m
+		where m.sta_no = #{sta_no}
+	</select>
+	<select id="getRecorderLastInsertNo" resultType="int">
+		SELECT max(sta_no) as cnt from recorder
+	</select>		
+	<select id="getRecorderImages" resultType="nms.system.vo.RecorderVO">
+		SELECT
+			rec_pic1,rec_pic2,rec_pic3,rec_pic4
+		FROM seis_web.recorder 
+		WHERE rec_no = #{no}
+	</select>
+	<select id="getRecorderMngList" resultType="nms.system.vo.RecorderVO">
+		select
+			rec_no, 
+		    sta_no, 
+		    net, 
+		    obs_id, 
+		    rec_id, 
+		    rec_company, 
+		    rec_model, 
+		    rec_serial, 
+		    warrenty, 
+		    wformat, 
+		    protocol, 
+		    regdate, 
+		    rec_pic1, 
+		    rec_pic2, 
+		    rec_pic3, 
+		    rec_pic4, 
+		    rec_tmp1, 
+		    rec_tmp2, 
+		    rec_tmp3
+		from seis_web.recorder_mng m
+		where m.rec_tmp2 = #{l_no}
+	</select>
+	<select id="getRecorderHistoryInfo" resultType="nms.system.vo.RecorderVO">
+		SELECT
+			rh_no, rec_no, sta_no, net, obs_id, rec_id, rec_company, (select obs_name from station s where s.sta_no = m.sta_no) as obs_name,
+			rec_model, rec_serial, warrenty, wformat, protocol, regdate,
+			rec_pic1, rec_pic2, rec_pic3, rec_pic4, rec_tmp1, rec_tmp2, rec_tmp3		
+		FROM recorder_history m 
+		WHERE rh_no = #{searchKeyword}
+	</select>
+	<select id="getRecorderMaintenanceList" resultType="nms.system.vo.RecorderVO">
+		select rec_tmp2,rec_tmp3 from recorder_history where rec_no = #{rec_no}
+	</select>
+	
+	<insert id="insertRecorder">
+		insert into recorder values(
+			0,#{sta_no},#{net},#{obs_id},#{rec_id},#{rec_company},#{rec_model},
+			#{rec_serial},#{warrenty},#{wformat},#{protocol},now(),#{rec_pic1},
+			#{rec_pic2},#{rec_pic3},#{rec_pic4},#{rec_tmp1},#{rec_tmp2},#{rec_tmp3}
+		)
+	</insert>
+	<insert id="insertReportRecorder">
+		insert into recorder_mng values(
+			0,#{sta_no},#{net},#{obs_id},#{rec_id},#{rec_company},#{rec_model},
+			#{rec_serial},#{warrenty},#{wformat},#{protocol},now(),#{rec_pic1},
+			#{rec_pic2},#{rec_pic3},#{rec_pic4},#{rec_tmp1},#{rec_tmp2},#{rec_tmp3}
+		)
+	</insert>	
+	<insert id="insertMaintenanceRecorder">
+		insert into recorder_history
+		select
+			0, rec_no, sta_no, net, obs_id, rec_id, rec_company, rec_model, rec_serial,
+			warrenty, wformat, protocol, now(), rec_pic1, rec_pic2, rec_pic3, rec_pic4, 
+			rec_tmp1,#{msg}, #{date}
+		from recorder 
+		WHERE rec_no = #{no}
+	</insert>
+	<update id="updateRecorder">
+		update recorder set 
+			rec_company = #{rec_company},
+			rec_model = #{rec_model},
+			rec_id = #{rec_id},
+			rec_serial= #{rec_serial},
+			warrenty = #{warrenty}, 
+			wformat = #{wformat},
+			protocol = #{protocol},
+			rec_pic1 = #{rec_pic1},
+			rec_pic2 = #{rec_pic2},
+			rec_pic3 = #{rec_pic3},
+			rec_pic4 = #{rec_pic4},
+			rec_tmp1 = #{rec_tmp1},
+			rec_tmp2 = #{rec_tmp2},
+			rec_tmp3 = #{rec_tmp3}
+		where rec_no = #{rec_no}
+	</update>
+	<update id="updateReportRecorder">
+		update recorder_mng set 
+			rec_company = #{rec_company},
+			rec_model = #{rec_model},
+			rec_id = #{rec_id},
+			rec_serial= #{rec_serial},
+			warrenty = #{warrenty}, 
+			wformat = #{wformat},
+			protocol = #{protocol},
+			rec_pic1 = #{rec_pic1},
+			rec_pic2 = #{rec_pic2},
+			rec_pic3 = #{rec_pic3},
+			rec_pic4 = #{rec_pic4},
+			rec_tmp1 = #{rec_tmp1},
+			rec_tmp2 = #{rec_tmp2},
+			rec_tmp3 = #{rec_tmp3}
+		where rec_no = #{rec_no}
+	</update>
+	<delete id="deleteRecorder">
+		delete from recorder where rec_no = #{rec_no}
+	</delete>
+	<delete id="deleteReportRecorder">
+		delete from recorder_mng where rec_no = #{rec_no}
+	</delete>
+</mapper>

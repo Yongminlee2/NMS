@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.main.mapper.MainMapper">
+	<resultMap id = "result_quakeevent_list" type = "nms.quakeoccur.vo.QuakeEventListVO" >
+		<result property="origintime" column="req_origintime"/>
+		<result property="lat" column="req_lat"/>
+		<result property="rlong" column="req_long"/>
+		<result property="mag" column="req_mag"/>
+		<result property="origin_area" column="req_origin_area"/>
+	</resultMap>
+
+	<select id="mainQuakeInfo" resultMap="result_quakeevent_list">
+		select DISTINCT DATE_FORMAT(req_origintime, '%Y-%m-%d %H:%i:%s') AS req_origintime, req_lat, req_long, req_mag, req_origin_area
+			FROM seis_request
+			ORDER BY req_origintime DESC LIMIT 5
+	</select>
+	
+	<select id="deleteAlarmList">
+		DELETE FROM seis_event_alarm
+	</select>
+</mapper>

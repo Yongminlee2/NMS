@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.board.mapper.InfoMapper">
+	<select id="InfoList" resultType="nms.board.vo.BoardVO">
+		SELECT 
+			no,board_dt,user_id,user_nm,board_title,CONVERT(board_content USING utf8) as board_content,views,file1 
+		FROM seis_web.board
+		where board_title like concat('%',#{searchKeyword},'%')
+		and date_format(board_dt,'%Y-%m-%d') between #{startDate} and #{endDate}
+		order by no desc
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	<select id="InfoListTotalCnt" resultType="int">
+		SELECT 
+			count(*) as cnt 
+		FROM seis_web.board
+		where board_title like concat('%',#{searchKeyword},'%')
+		and date_format(board_dt,'%Y-%m-%d') between #{startDate} and #{endDate}
+		order by no desc	
+	</select>
+	<select id="getInfoView" resultType="nms.board.vo.BoardVO">
+		SELECT 
+			no,board_dt,user_id,user_nm,board_title,CONVERT(board_content USING utf8) as board_content,views,file1 
+		FROM seis_web.board		
+		WHERE no = #{info_no}	
+	</select>
+	<select id="lastInsertNo" resultType="int">
+		SELECT MAX(NO) as no FROM board
+	</select>	
+	<select id="getNoticeFileList" resultType="nms.util.vo.FileVO">
+		SELECT
+			f_no, f_name,f_realname
+		FROM seis_web.file_list
+		WHERE m_key = #{no}
+	</select>
+	
+	<insert id="insertInfo">
+		INSERT INTO seis_web.board values (
+			0,now(),#{user_id},#{user_nm},#{board_title},#{board_content},0,''
+		)	
+	</insert>
+	<update id="updateInfo">
+		UPDATE seis_web.board set 
+			board_title = #{board_title},board_content=#{board_content}
+		where no=#{no}
+	</update>
+	<delete id="deleteInfo">
+		delete from seis_web.board where no=#{info_no}
+	</delete>
+</mapper>

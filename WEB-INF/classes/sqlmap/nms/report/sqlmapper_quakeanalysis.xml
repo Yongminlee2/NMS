@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.report.mapper.QuakeAnalysisMapper">
+
+	<resultMap id = "result_list" type = "nms.report.vo.QuakeAnalysisListVO" >
+		<result property = "no" column = "m_no"/>
+		<result property = "org" column = "m_org"/>
+		<result property = "origintime" column = "m_origintime"/>
+		<result property = "mag" column = "m_mag"/>
+		<result property = "address" column = "m_address"/>
+		<result property = "lat" column = "m_lat"/>
+		<result property = "mlong" column = "m_long"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<select id="getQuakeAnalysisList" parameterType="String" resultMap = "result_list, result_list_count" statementType="CALLABLE" >
+		{Call QUAKE_ANALYSIS_LIST(#{date}, #{obs_kind}, #{page})}
+	</select>
+</mapper>

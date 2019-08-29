@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.googlemaps.mapper.TestMapper">
+	<select id="retrieveDatas" resultType="String">
+		SELECT st_pga_3d FROM seis_web.seis_st01_g_wave where st_epochtime between unix_timestamp() - 999999 and unix_timestamp() order by st_epochtime desc limit 1
+	</select>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.quakeoccur.mapper.DistributionMapper">
+
+	<resultMap id = "result_distribution_list" type = "nms.quakeoccur.vo.QuakeEventListVO" >
+		<result property="no" column="req_no"/>
+		<result property="origintime" column="req_origintime"/>
+		<result property="lat" column="req_lat"/>
+		<result property="rlong" column="req_long"/>
+		<result property="mag" column="req_mag"/>
+		<result property="origin_area" column="req_origin_area"/>
+		<result property="org" column="req_org"/>
+		<result property="nearSta" column="req_near_sta"/>
+		<result property="nearKM" column="req_near_km"/>
+		<result property="maxPga" column="req_max_pga"/>
+		<result property="maxChan" column="req_max_chan"/>
+	</resultMap>
+	
+	<!-- <resultMap id = "result_distribution_map" type = "nms.quakeoccur.vo.QuakeEventListVO" >
+		<result property="lat" column="req_lat"/>
+		<result property="rlong" column="req_long"/>
+	</resultMap> -->
+	
+	<resultMap type="int" id="result_distribution_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<select id="getDistributionList" parameterType="String" resultMap = "result_distribution_list, result_distribution_list_count" statementType="CALLABLE" >
+		{Call DISTRIBUTION_LIST(#{date_str}, #{date_end}, #{page})}
+	</select>
+	
+	<select id="getDistributionMap" parameterType="String" resultMap = "result_distribution_list" statementType="CALLABLE" >
+		{Call DISTRIBUTION_MAP(#{date_str}, #{date_end})}
+	</select>
+	
+	<select id="getQuakeList" resultType="nms.quakeoccur.vo.QuakeEventListVO">
+		select req_lat as lat ,req_long as rlong,req_origintime as origintime, req_mag as mag from seis_request where 
+		req_origintime between #{stDate} and #{enDate} group by req_id
+	</select>
+	
+</mapper>

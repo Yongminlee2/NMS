@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.report.mapper.EventAlarmMapper">
+
+	<resultMap id = "result_event_alarm_list" type = "nms.report.vo.EventAlarmListVO" >
+		<result property = "no" column = "e_no"/>
+		<result property = "user_id" column = "e_user_id"/>
+		<result property = "sms_flag" column = "e_sms_flag"/>
+		<result property = "sms_time" column = "e_sms_time"/>
+		<result property = "mail_flag" column = "e_mail_flag"/>
+		<result property = "mail_time" column = "e_mail_time"/>
+		<result property = "type" column = "e_evt_type"/>
+		<result property = "id" column = "e_evt_id"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_event_alarm_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<select id="getEventAlarmList" parameterType="String" resultMap = "result_event_alarm_list, result_event_alarm_list_count" statementType="CALLABLE" >
+		{Call EVENT_ALARM_LIST(#{date},#{date2}, #{obs_kind}, #{page})}
+	</select>
+</mapper>

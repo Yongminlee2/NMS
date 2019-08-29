@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.util.mapper.UtilMapper">
+
+	<select id="getStationInfo" resultType="nms.util.vo.StationVO">
+		SELECT
+			sta_no,          
+			net,             
+			(SELECT codeDesc from code_desc where mainCode = 'net' and codeId = s.net) as net_name,
+			obs_id,          
+			replace(replace(obs_name, '원자력발전소',''), '발전소','') as obs_name,        
+			contractdate,    
+			completedate,    
+			price_contract,  
+			price_sw,        
+			price_hw,        
+			opendate,        
+			offdate,         
+			area,            
+			address,         
+			obs_kind,        
+			position,        
+			lon,             
+			lat,             
+			altitude,        
+			ground_ht,       
+			uground_ht,      
+			base,            
+			str_cd,          
+			seis_cd,         
+			ground,          
+			hole,            
+			seis_ds,         
+			design_acc,      
+			threshold_acc,  
+			build_floor,     
+			eq_area,         
+			hole_map,        
+			charge,          
+			contact,         
+			user_id,         
+			regdate,         
+			sta_type,        
+			sta_ip,          
+			sta_pic1,        
+			sta_pic2,        
+			sta_pic3,        
+			sta_pic4,        
+			sta_tmp1,        
+			sta_tmp2,        
+			sta_tmp3,
+			(select codeDesc from code_desc where mainCode = 'obs_kind' and codeId = sta_tmp1) as obs_kind_name
+		FROM seis_web.station s	
+		where sta_tmp1 != 'CJ'
+	</select>
+	
+	<select id="getStationCodeInfoList" resultType="nms.util.vo.CodeVO">
+		SELECT 
+			codeId,
+		    codeDesc,
+		    etc
+		FROM seis_web.code_desc where mainCode=#{mainCode};
+	</select>
+	
+	<select id="getCodeInfoList" resultType="nms.util.vo.CodeVO">
+		SELECT 
+			mainCode,
+			codeId,
+		    codeDesc,
+		    etc
+		FROM seis_web.code_desc
+		ORDER BY mainCode
+	</select>
+	
+	<select id = "getStationOfSensorInfo" resultType = "nms.util.vo.StationVO">
+		select 
+			sen.sen_id as obs_id, 
+			concat(replace(replace(sta.obs_name, '원자력발전소',''), '발전소',''), '(', sen.sen_location, ')') as obs_name,
+			sta.sta_tmp1
+		from station sta
+		inner join sensor sen on (sta.sta_no = sen.sta_no)
+		where sen.sen_tmp1 != 'x' and sta_tmp1 != 'CJ' AND sen.sen_location != 'r'
+		order by sta.obs_name
+	</select>
+	
+	<select id = "getStationOfSensorInfo2" resultType = "nms.util.vo.StationVO">
+		select sta_id as obs_id, concat(replace(replace(obs_name, '원자력발전소',''), '발전소',''), '_', senname) as obs_name, sta.sta_tmp1
+			from (
+					select tablename as sta_id, substring(tablename, 1, 4) as tablename, substring(tablename, 6, 7) as senname, sen_rep
+						from seis_nf where pga_val is not null
+					union all 
+					select tablename as sta_id, substring(tablename, 1, 4) as tablename, substring(tablename, 6, 7) as senname, sen_rep
+						from seis_hp where pga_val is not null
+					union all
+					select tablename as sta_id, substring(tablename, 1, 4) as tablename, substring(tablename, 6, 7) as senname, sen_rep
+						from seis_ps where pga_val is not null
+				) p
+			inner join station sta on (sta.sta_type = p.tablename)
+	</select>
+	
+	<select id="setStationSensorTable">
+		{Call STATION_SENSOR_SETTING()}
+	</select>
+		
+	<select id="getStationNames" resultType = "nms.util.vo.StationVO">
+		select 
+			sta_tmp1,
+			replace(replace(sta_tmp2,'발전소',''),'원자력','') as obs_name,
+		    (select count(*) as obs_name from (select obs_name,sta_tmp1 from station s group by sta_tmp2 order by sta_no) tb  where tb.sta_tmp1 = m.sta_tmp1) as sta_tmp3,
+		    m.obs_id
+		from station m
+		where sta_tmp1 not in('CJ')
+		group by sta_tmp2
+		order by sta_no	
+	</select>
+</mapper>

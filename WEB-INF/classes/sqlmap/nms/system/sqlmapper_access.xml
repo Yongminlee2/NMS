@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.AccessMapper">
+	<select id="getAccessList" resultType="nms.system.vo.AccessVO">
+		SELECT
+			maincategory,
+			subcategory,
+			s1,
+			s2,
+			s3,
+			s4,
+			m1,
+			m2,
+			m3,
+			m4
+		FROM access
+	</select>
+	
+	<update id="updateAccessInfo" parameterType="nms.system.vo.AccessVO">
+		UPDATE access SET		
+			s1          = #{s1},
+			s2          = #{s2},
+			s3          = #{s3},
+			s4          = #{s4},
+			m1          = #{m1},
+			m2          = #{m2},
+			m3          = #{m3},
+			m4          = #{m4}
+		WHERE subcategory = #{subcategory} 
+	</update>
+</mapper>

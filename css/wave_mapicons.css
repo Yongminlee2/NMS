@@ -1,0 +1,57 @@
+@CHARSET "EUC-KR";
+
+.NC { background-color: white; width: 15px; height: 15px; -webkit-border-radius:10px; -moz-border-radius:10px;}
+.WP {width: 0;height: 0;border-left: 10px solid transparent;border-right: 10px solid transparent; border-bottom: 14px solid white;}
+.PP {background: white; width: 15px; height: 15px;}
+/* #kuk_1 {position: relative; width: 10px; border-width: 10px 4px 0; border-style: solid; border-color: #f0ec31 transparent;}
+#kuk_1:before {content: ""; position: absolute; height: 0; width: 0; top: -19px; left: -4px; border-width: 0 9px 9px; border-style: solid; border-color: transparent transparent #f0ec31;} */
+.CJ {
+	margin: 5px 0;
+	position: relative;
+	display: none;
+	color: #f0ec31;
+	width: 0px;
+	height: 0px;
+	border-right:  10px solid transparent;
+	border-bottom: 7px  solid #f0ec31;
+	border-left:	10px solid transparent;
+	-moz-transform:	 rotate(35deg);
+	-webkit-transform: rotate(35deg);
+	-ms-transform:	rotate(35deg);
+	-o-transform:	rotate(35deg);
+	
+}
+.CJ:before {
+	border-bottom: 8px solid #f0ec31;
+	border-left: 3px solid transparent;
+	border-right: 3px solid transparent;
+	position: absolute;
+	height: 0;
+	width: 0;
+	top: -4.5px;
+	left: -6.5px;
+	display: none;
+	content: '';
+	-webkit-transform: rotate(-35deg);
+	-moz-transform:	 rotate(-35deg);
+	-ms-transform:	rotate(-35deg);
+	-o-transform:	rotate(-35deg);
+
+}
+.CJ:after {
+	position: absolute;
+	display: none;
+	color: #f0ec31;
+	top: 0px;
+	left: -10.5px;
+	width: 0px;
+	height: 0px;
+	border-right: 10px solid transparent;
+	border-bottom: 7px solid #f0ec31;
+	border-left: 10px solid transparent;
+	-webkit-transform: rotate(-70deg);
+	-moz-transform:	rotate(-70deg);
+	-ms-transform:	rotate(-70deg);
+	-o-transform:	rotate(-70deg);
+	content: '';
+}

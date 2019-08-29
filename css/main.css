@@ -1,0 +1,42 @@
+@charset "euc-kr";
+
+
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   HEADER  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+
+.topGnb{position:relative;width: 100%;height: 64px;}
+.topGnb .logo{float:left;background:url(../img/logo.jpg);margin-top: 5px;width: 305px;height: 50px;text-indent:-9999px;}
+.topGnb .logo a{display:block;305px;height: 50px;}
+.topGnb ul.gnb{float:right;width: 170px;font-size:14px;color:#084b75;}
+.topGnb .gnb li{display:inline-block;width: 80px;text-align:center;margin-top:25px;}
+.topGnb .gnb li.g1{border-right:1px solid #bcbcbc;height: 15px;}
+
+
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   BODY  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+.con_body{position:relative;top:165px;}
+.con_left{float:left;width:550px;height:735px;overflow:hidden;}
+.con_right{float:right;width:890px;height:735px;overflow:hidden;}
+/**left contents**/
+.m_text{width:550px;height:145px;background:url(../img/m_text.png) no-repeat;}
+.m_map{width:550px;height:550px;background:url(../img/m_con01.png) no-repeat;}
+
+/**right contents**/
+.m_icon{width:890px;height:224px;overflow:hidden;}
+.m_icon li {float:left;}
+.m_icon li a{width:222px;height:224px;display:block;text-indent:-9999px;}
+.m_icon .mcon1{background:url(../img/m_icon01.png) no-repeat;}
+.m_icon .mcon2{background:url(../img/m_icon02.png) no-repeat;}
+.m_icon .mcon3{background:url(../img/m_icon03.png) no-repeat;}
+.m_icon .mcon4{background:url(../img/m_icon04.png) no-repeat;}
+
+.m_table{width:890px;height:430px;margin-top:42px;overflow:hidden;background:url(../img/m_con03.png) no-repeat;}
+caption{}
+.m_more{float:right;margin-top:24px;text-indent:-9999px;margin-right:35px;}
+.m_more a{width:102px;height:45px;background:url(../img/btt_more.png) no-repeat;display:block;}
+.m_table table{margin-top:82px;margin-left:40px;width:820px;text-align:center;}
+.m_table thead{background:url(../img/m_table_th.gif) repeat-x;height:54px;}
+.m_table thead th{color:#282b2d;font-weight:bold;font-size:18px;border-bottom:2px solid #cbcbcb;height:55px;}
+.m_table tbody td{font-size:16px;height:50px;border-bottom:1px solid #cbcbcb;}
+.now{background:#bbf0ff;}
+
+#prograss-bar-background{position: absolute;z-index: 998;width: 100%;height: 100%;background-color: black;opacity: 0.3;display: none;}
+#prograss-bar{z-index: 999;position: absolute;top: 41%;left: 44%;display: none;}

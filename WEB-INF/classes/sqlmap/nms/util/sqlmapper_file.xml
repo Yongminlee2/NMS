@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.util.mapper.FileMapper">
+	<insert id="insertFile" parameterType="string">
+		INSERT INTO seis_web.file_list values(
+			0,#{m_key},#{f_path},#{f_name},#{f_realname}
+		)
+	</insert>
+	<select id="selectFileInfo" resultType="nms.util.vo.FileVO">
+		SELECT f_no, m_key,f_path,f_name,f_realname FROM file_list WHERE f_no = #{f_no}
+	</select>
+	<select id="selectFileInfoList" resultType="nms.util.vo.FileVO">
+		SELECT f_no, m_key,f_path,f_name,f_realname FROM file_list WHERE m_key = #{m_key}
+	</select>	
+	<delete id="deleteFile">
+		DELETE FROM file_list WHERE f_no = #{f_no}
+	</delete>
+	
+	<update id="updateStationImg">
+		UPDATE seis_web.station SET
+			<if test="picName == 'sta_pic1'">
+				sta_pic1 = #{pic_path}
+			</if>
+			<if test="picName == 'sta_pic2'">
+				sta_pic2 = #{pic_path}
+			</if>
+			<if test="picName == 'sta_pic3'">
+				sta_pic3 = #{pic_path}
+			</if>
+			<if test="picName == 'sta_pic4'">
+				sta_pic4 = #{pic_path}
+			</if>
+		WHERE sta_no = #{no}
+	</update>
+
+	<update id="updateSensorImg">
+		UPDATE seis_web.sensor SET
+			<if test="picName == 'sen_pic1'">
+				sen_pic1 = #{pic_path}
+			</if>
+			<if test="picName == 'sen_pic2'">
+				sen_pic2 = #{pic_path}
+			</if>
+			<if test="picName == 'sen_pic3'">
+				sen_pic3 = #{pic_path}
+			</if>
+			<if test="picName == 'sen_pic4'">
+				sen_pic4 = #{pic_path}
+			</if>
+		WHERE sen_no = #{no}	
+	</update>
+	
+	<update id="updateRecorderImg">
+		UPDATE seis_web.recorder SET
+			<if test="picName == 'rec_pic1'">
+				rec_pic1 = #{pic_path}
+			</if>
+			<if test="picName == 'rec_pic2'">
+				rec_pic2 = #{pic_path}
+			</if>
+			<if test="picName == 'rec_pic3'">
+				rec_pic3 = #{pic_path}
+			</if>
+			<if test="picName == 'rec_pic4'">
+				rec_pic4 = #{pic_path}
+			</if>
+		WHERE rec_no = #{no}
+	</update>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.inforeceived.mapper.DataCollRateMapper">
+
+	<resultMap id = "result_datacollrate_day_list" type = "nms.inforeceived.vo.DataCollRateListVO" >
+		<result property = "tmp1" column = "sta_tmp1"/>
+		<result property = "station" column = "r_obs_id"/>
+		<result property = "date" column = "selected_date"/>
+		<result property = "obs_name" column = "obs_name"/>
+		<result property = "hgz" column = "HGZ"/>
+		<result property = "hge" column = "HGE"/>
+		<result property = "hgn" column = "HGN"/>
+		<result property = "hhz" column = "HHZ"/>
+		<result property = "hhe" column = "HHE"/>
+		<result property = "hhn" column = "HHN"/>
+		<result property = "hdy" column = "HDY"/>
+		<result property = "hdz" column = "HDZ"/>
+		<result property = "hpy" column = "HPY"/>
+		<result property = "hpz" column = "HPZ"/>
+	</resultMap>
+	
+	<!-- <resultMap id = "result_datacollrate_month_list" type = "nms.inforeceived.vo.DataCollRateListVO" >
+		<result property = "year" column = "r_year"/>
+		<result property = "month" column = "r_month"/>
+		<result property = "obs_name" column = "obs_name"/>
+		<result property = "hgz" column = "HGZ"/>
+	</resultMap> -->
+	
+	<resultMap id = "result_datacollrate_day_check_list" type = "nms.inforeceived.vo.DataCollRateListVO" >
+		<result property = "date" column = "r_date"/>
+		<result property = "year" column = "r_year"/>
+		<result property = "month" column = "r_month"/>
+		<result property = "day" column = "r_day"/>
+		<result property = "station" column = "r_station"/>
+		<result property = "tmp1" column = "r_tmp1"/>
+		<result property = "tmp2" column = "r_tmp2"/>
+		<result property = "tmp3" column = "r_tmp3"/>
+		<result property = "tmp4" column = "r_tmp4"/>
+	</resultMap>
+	
+	<select id="getDataCollRateExcelList" parameterType="String" resultMap = "result_datacollrate_day_list, result_datacollrate_day_list, result_datacollrate_day_list" statementType="CALLABLE" >
+		{Call DATACOLLRATE_LIST_EXCEL(#{dateS}, #{dateE}, #{type}, #{sta_type})}
+	</select>
+	
+	<select id="getDataCollRateList" parameterType="String" resultMap = "result_datacollrate_day_list" statementType="CALLABLE" >
+		{Call DATACOLLRATE_LIST(#{dateS}, #{dateE}, #{type}, #{sta_type})}
+	</select>
+	
+	<select id="getDataCollRateListCheck" parameterType="String" resultMap = "result_datacollrate_day_check_list" statementType="CALLABLE" >
+		{Call DATACOLLRATE_LIST(#{dateS}, #{dateE}, #{type}, #{sta_type})}
+	</select>
+</mapper>

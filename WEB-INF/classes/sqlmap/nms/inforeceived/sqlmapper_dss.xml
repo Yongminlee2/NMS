@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.inforeceived.mapper.DssMapper">
+
+	<resultMap id = "result_dss_list" type = "nms.inforeceived.vo.DssListVO" >
+		<result property = "no" column = "l_no"/>
+		<result property = "code" column = "l_code"/>
+		<result property = "chk_time" column = "l_chk_time" jdbcType="VARCHAR"/>
+		<result property = "last_time" column = "l_last_time" jdbcType="VARCHAR"/>
+		<result property = "sub_time" column = "l_sub_time"/>
+		<result property = "two_pga" column = "l_2d_pga"/>
+		<result property = "three_pga" column = "l_3d_pga"/>
+		<result property = "ud_pga" column = "l_ud_pga"/>
+		<result property = "ns_pga" column = "l_ns_pga"/>
+		<result property = "ew_pga" column = "l_ew_pga"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_dss_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<select id="getDssList" parameterType="String" resultMap = "result_dss_list, result_dss_list_count" statementType="CALLABLE" >
+		{Call DSS_LIST(#{date_s}, #{date_e}, #{obs_kind}, #{sta_type}, #{page})}
+	</select>
+</mapper>

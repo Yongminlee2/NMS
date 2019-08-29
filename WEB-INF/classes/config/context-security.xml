@@ -1,0 +1,70 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/security
+                        http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<security:http auto-config="true">
+		<security:intercept-url pattern="/" 					access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/index**" 				access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/login**" 				access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/monitoring/**" 		access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/main/**" 				access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/inforeceived/**"		access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/quakeoccur/**"		access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/report/**"			access="ROLE_ADMIN,ROLE_USER" />
+		<security:intercept-url pattern="/system/**"			access="ROLE_ADMIN,ROLE_USER" />
+		
+<!-- 		ROLE_ADMIN,ROLE_USER -->
+		<security:intercept-url pattern="/board/**"				access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/getMailSend.do"		access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/getMailSendTest.do"	access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/download/**" 			access="ROLE_ADMIN,ROLE_USER" />
+		<security:form-login 
+			login-page="/login"
+			default-target-url="/"
+			always-use-default-target="true" 
+			password-parameter="j_password"
+			username-parameter="j_username"
+			authentication-failure-url="/login?login_error=1" 
+			authentication-failure-handler-ref="loginFailureHandler" />
+		<security:logout invalidate-session="true" logout-url="/j_spring_security_logout" logout-success-url="/logout.do" />
+<!-- 		<security:custom-filter after="EXCEPTION_TRANSLATION_FILTER" ref="ajaxSessionTimeoutFilter"/> -->
+	</security:http>
+	
+<!-- 	<bean id="ajaxSessionTimeoutFilter" class="nms.sec.AjaxSessionTimeoutFilter"> -->
+<!-- 		<property name="ajaxHeader" value="AJAX"/> -->
+<!-- 	</bean> -->
+
+	<bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+<!-- 	<bean id="encoder" class="kr.co.dodo1.oam.util.passwordEncoderCustom"/> -->
+	
+	
+	
+	<bean id="userDetailsService" class="nms.sec.JdbcDaoImplExt">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="usersByUsernameQuery" 
+				value="SELECT 
+						user_id 
+						, user_pw
+						, user_name as user_nm
+						, user_department as user_dept
+						, user_auth
+						, user_tmp1
+						from user where user_id = ?" />
+
+		<property name="authoritiesByUsernameQuery"	
+				value="SELECT  user_name as user_nm
+							, user_auth as authority
+							from user where user_id = ?" />
+	</bean>
+	
+	<bean id="loginFailureHandler" class="nms.sec.LoginFailureHandler"></bean>
+
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="userDetailsService" >
+			<security:password-encoder ref="encoder"></security:password-encoder>
+		</security:authentication-provider>	
+	</security:authentication-manager>
+</beans>

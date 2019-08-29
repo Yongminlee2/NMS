@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.inforeceived.mapper.RawMapper">
+
+	<resultMap id = "result_raw_list" type = "nms.inforeceived.vo.RawListVO" >
+		<result property = "no" column = "l_no"/>
+		<result property = "code" column = "l_code"/>
+		<result property = "channel" column = "l_channel"/>
+		<result property = "chk_time" column = "l_chk_time"/>
+		<result property = "last_time" column = "l_last_time"/>
+		<result property = "sub_time" column = "l_sub_time"/>
+		<result property = "sample" column = "l_sample"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_raw_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<select id="getRawList" parameterType="String" resultMap = "result_raw_list, result_raw_list_count" statementType="CALLABLE" >
+		{Call RAW_LIST(#{date_s}, #{date_e}, #{obs_kind}, #{sta_type}, #{page})}
+	</select>
+</mapper>

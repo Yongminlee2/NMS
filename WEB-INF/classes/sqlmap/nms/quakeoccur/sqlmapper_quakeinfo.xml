@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.quakeoccur.mapper.QuakeInfoMapper">
+
+	<resultMap id = "result_quakeevent_list" type = "nms.quakeoccur.vo.QuakeEventListVO" >
+		<result property="no" column="req_no"/>
+		<result property="id" column="req_id"/>
+		<result property="date" column="req_date"/>
+		<result property="epochtime" column="req_epochtime"/>
+		<result property="origintime" column="req_origintime"/>
+		<result property="lat" column="req_lat"/>
+		<result property="rlong" column="req_long"/>
+		<result property="mag" column="req_mag"/>
+		<result property="origin_area" column="req_origin_area"/>
+		<result property="starttime" column="req_starttime"/>
+		<result property="endtime" column="req_endtime"/>
+		<result property="send" column="req_send"/>
+		<result property="recv" column="req_recv"/>
+		<result property="status" column="req_status"/>
+		<result property="flag" column="req_flag"/>
+		<result property="org" column="req_org"/>
+		<result property="station" column="req_station"/>
+		<result property="station2" column="req_station2"/>
+		<result property="tmp1" column="req_tmp1"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_quakeevent_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+	
+	<resultMap id = "result_selfevent_list" type = "nms.quakeoccur.vo.SelfEventListVO" >
+		<result property="no" column="evt_no"/>
+		<result property="timestamp" column="evt_timestamp"/>
+		<result property="epochtime" column="evt_epochtime"/>
+		<result property="org" column="evt_org"/>
+		<result property="station" column="evt_station"/>
+		<result property="location" column="evt_location"/>
+		<result property="z" column="evt_z"/>
+		<result property="n" column="evt_n"/>
+		<result property="e" column="evt_e"/>
+		<result property="twod" column="evt_2d"/>
+		<result property="threed" column="evt_3d"/>
+		<result property="level" column="evt_level"/>
+		<result property="send" column="evt_send"/>
+		<result property="recv" column="evt_recv"/>
+		<result property="status" column="evt_status"/>
+		<result property="reason" column="evt_reason"/>
+		<result property="tmp1" column="evt_tmp1"/>
+	</resultMap>
+	
+	<resultMap id="result_eventreport" type="nms.quakeoccur.vo.SelfEventListVO">
+		<result property="timestamp" column="evt_timestamp"/>
+		<result property="org" column="evt_org"/>
+		<result property="z" column="evt_z"/>
+		<result property="n" column="evt_n"/>
+		<result property="e" column="evt_e"/>
+		<result property="tmp2" column="timearea"/>
+		<result property="epoch_time" column="epoch_time"/>
+		<result property="delay_time" column="delay_time"/>
+		<result property="full_date" column="full_date"/>
+	</resultMap>
+	
+	<resultMap type="int" id="result_selfevent_list_count">
+		<result property = "totalCnt" column = "totalCnt"/>
+	</resultMap>
+
+	<resultMap id="result_quake_report" type="nms.quakeoccur.vo.QuakeEventReportVO">
+		<result property="date" column="origin_date"/>
+		<result property="time" column="origin_time"/>
+		<result property="lat" column="req_lat"/>
+		<result property="lon" column="req_long"/>
+		<result property="area" column="req_origin_area"/>
+		<result property="mag" column="req_mag"/>	
+		<result property="org" column="req_org"/>
+		<result property="timearea" column="timearea"/>
+		<result property="epoch_time" column="epoch_time"/>
+		<result property="delay_time" column="delay_time"/>
+		<result property="full_date" column="full_date"/>
+		<result property="req_id" column="req_id"/>
+		<result property="req_date" column="req_date"/>
+		<result property="req_starttime" column="req_starttime"/>
+		<result property="req_endtime" column="req_endtime"/>
+	</resultMap>
+		
+	<select id="getQuakeEventList" parameterType="String" resultMap = "result_quakeevent_list, result_quakeevent_list_count" statementType="CALLABLE" >
+		{Call QUAKE_EVENT_LIST(#{date},#{date2}, #{obs_kind}, #{sta_type}, #{page})}
+	</select>
+	
+	<select id="getSelfEventList" parameterType="String" resultMap = "result_selfevent_list, result_selfevent_list_count" statementType="CALLABLE" >
+		{Call SELF_EVENT_LIST(#{date},#{date2}, #{obs_kind}, #{sta_type}, #{page})}
+	</select>
+	
+	<select id="getQuakeEventSubList" resultMap = "result_quakeevent_list">
+		SELECT 
+			req_no as req_tmp1,req_id, req_date, req_epochtime, 
+		    req_origintime, req_lat, req_long, req_mag, req_origin_area, req_starttime, req_endtime, 
+		    req_send, req_recv, case req_status when 1 then '성공' when 0 then '전송중' when -1 then '재전송 요청' when -2 then '연결 실패' when -3 then '전송 오류' end as req_status, 
+		    req_flag, req_org, (select obs_name from station s where s.obs_id = m.req_station) as req_station ,req_station as req_station2
+		FROM seis_request m 
+		WHERE req_id = #{req_id} and req_org like concat('%',#{req_org},'%') and req_station like concat('%',#{req_sta},'%')
+		order by req_origintime desc 	
+	</select>
+	
+	<select id="getSelfReportData" parameterType="string" resultMap="result_eventreport">
+		SELECT
+			concat(date_format(addtime(evt_timestamp,-30),'%T'),' ~ ',date_format(addtime(addtime(evt_timestamp,50),40),'%T')) as timearea,
+			evt_timestamp,
+			replace((select obs_name from station s where s.obs_id = m.evt_station),#{replaceWord},'') as evt_org,
+			round(evt_z/980,6) as evt_z,
+			round(evt_n/980,6) as evt_n,
+			round(evt_e/980,6) as evt_e,
+			evt_epochtime-30 as epoch_time,
+		    '30' as delay_time,
+		    date_format(evt_timestamp,'%Y-%m-%d') as full_date
+		FROM seis_event m
+		WHERE evt_no = #{no}
+	</select>
+	
+	<select id="getSelfReportDataAll" resultType="nms.quakeoccur.vo.QuakeEventReportVO">
+		SELECT 
+			replace(s.obs_name,#{replaceWord},'') as obs_name,
+		    m.sen_id as sen_id,
+		    m.net as net,
+		    date_format(now(),'%Y-%m-%d %T') as max_time
+
+		FROM seis_web.sensor m
+		left outer join station s on m.sta_no = s.sta_no
+		where sen_location in ('G') and s.sta_tmp1 = #{org}
+	</select>	
+	
+	<select id="getQuakeReportData" resultMap="result_quake_report">
+		SELECT
+			date_format(req_origintime,'%Y-%m-%d') as origin_date,
+            date_format(req_origintime,'%T') origin_time,
+            req_lat,
+            req_long,
+            req_origin_area,
+            req_mag,
+            date_format(req_starttime,'%Y-%m-%d %T') as req_starttime,
+            date_format(req_endtime,'%Y-%m-%d %T') as req_endtime,
+            req_org,
+            concat(date_format(req_starttime,'%T'),' ~ ',date_format(req_endtime,'%T')) as timearea,
+		    ceil(UNIX_TIMESTAMP(req_origintime))-30 epoch_time,
+<!-- 		    req_epochtime-30 as  epoch_time, -->
+		    req_endtime - req_starttime as delay_time,
+		    date_format(req_origintime,'%Y-%m-%d') as full_date,
+		    req_date,
+		    req_id
+		FROM seis_request
+		WHERE req_id = #{no}
+		GROUP BY req_id
+	</select>
+	
+	<select id="getQuakeReportDataAll" resultType="nms.quakeoccur.vo.QuakeEventReportVO">
+		SELECT 
+			replace(s.obs_name,#{replaceWord},'') as obs_name,
+		    m.sen_id as sen_id,
+		    m.net as net,
+		    s.address as address,
+		    lat as lat,
+		    lon as lon,
+		    (select count(*) from sensor ss where ss.obs_id = m.obs_id group by obs_id) as cnt,
+		    m.obs_id,
+            (select sta_tmp1 from station s2 where  s2.sta_no = m.sta_no) as station_type
+		FROM seis_web.sensor m
+		left outer join station s on m.sta_no = s.sta_no
+		where sen_location in ('G') and s.sta_tmp1 = #{org}
+	</select>
+	<select id="getQuakeReportHistoryData" resultMap="result_quake_report">
+		SELECT
+			date_format(req_origintime,'%Y-%m-%d') as origin_date,
+            date_format(req_origintime,'%T') origin_time,
+            req_lat,
+            req_long,
+            req_origin_area,
+            req_mag,
+            req_org,
+            concat(date_format(req_starttime,'%T'),' ~ ',date_format(req_endtime,'%T')) as timearea,
+		    ceil(UNIX_TIMESTAMP(req_starttime)) epoch_time,
+		    req_endtime - req_starttime as delay_time,
+		    date_format(req_origintime,'%Y-%m-%d') as full_date,
+		    req_date,
+		    req_id
+		FROM seis_request
+		where req_origintime &lt; date_format(#{date}, '%Y-%m-%d %T')
+		group by req_id
+		order by req_origintime desc
+		limit 0 , ${no}
+<!-- 		<if test="no != null and no eq '13'"> -->
+<!-- 			limit 0 , 13 -->
+<!-- 		</if>  -->
+<!-- 		<if test="no != null and no eq '10'"> -->
+<!-- 			limit 0 , 10 -->
+<!-- 		</if> 				  -->
+	</select>
+	<select id="getQuakeSummaryReportDataAll" resultType="nms.quakeoccur.vo.QuakeEventReportVO">
+		SELECT 
+			replace(s.obs_name,#{replaceWord},'') as obs_name,
+		    m.sen_id as sen_id,
+		    m.net as net,
+		    s.address as address,
+		    lat as lat,
+		    lon as lon,
+		    (select count(*) from sensor ss where ss.obs_id = m.obs_id group by obs_id) as cnt,
+		    m.obs_id
+		FROM seis_web.sensor m
+		left outer join station s on m.sta_no = s.sta_no
+		where sen_location in ('G') and s.sta_tmp1 = #{org} and not obs_name REGEXP  'B|E|C|D|F|G|H|I'
+	</select>	
+</mapper>

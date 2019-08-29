@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.ObservatoryMapper">
+	<select id="getStationInfoList" resultType="nms.system.vo.ObservatoryVO">
+		select
+			sta_no,          
+			net,             
+			CASE sta_tmp1 WHEN 'NC' THEN '원전부지' ELSE CASE sta_tmp1 WHEN 'WP' THEN '수력발전' ELSE  CASE sta_tmp1 WHEN 'CJ' THEN '천지발전' ELSE '양수발전' END END END as obs_kind,
+			obs_id,
+<!-- 		    s1.etc as obs_desc, -->
+			obs_name,        
+			contractdate,    
+			completedate,    
+			price_contract,  
+			price_sw,        
+			price_hw,        
+			opendate,        
+			offdate,         
+			area,            
+			address,         
+<!-- 			obs_kind, -->
+		    s2.codedesc as obs_kind_desc,
+			position,        
+			lon,             
+			lat,             
+			altitude,        
+			ground_ht,       
+			uground_ht,      
+			base, 
+		    s3.codedesc as base_desc,
+			str_cd,          
+		    s4.codedesc as str_cd_desc,
+			seis_cd,         
+		    s5.codedesc as seis_cd_desc,
+			ground,          
+		    s6.codedesc as ground_desc,
+			hole,            
+			seis_ds,         
+			design_acc,      
+			threshold_acc,  
+			build_floor,     
+			eq_area,         
+			hole_map,        
+			charge,          
+			contact,         
+			user_id,         
+			regdate,         
+			sta_type,        
+			sta_ip,          
+			sta_pic1,        
+			sta_pic2,        
+			sta_pic3,        
+			sta_pic4,        
+			sta_tmp1,        
+			sta_tmp2,        
+			sta_tmp3    
+		from seis_web.station m
+		left join seis_web.code_desc s1 on s1.codeid=m.obs_id and s1.maincode='obs'
+		left join seis_web.code_desc s2 on s2.codeid=m.obs_kind and s2.maincode='faci'
+		left join seis_web.code_desc s3 on s3.codeid=m.base and s3.maincode='base'
+		left join seis_web.code_desc s4 on s4.codeid=m.str_cd and s4.maincode='str_cd'
+		left join seis_web.code_desc s5 on s5.codeid=m.seis_cd and s5.maincode='seis_cd'
+		left join seis_web.code_desc s6 on s6.codeid=m.ground and s6.maincode='ground'
+		left join seis_web.code_desc area on area.codeid=m.obs_id and area.maincode='area'	
+		<if test="searchKeyword != null and searchKeyword != ''">
+			where m.sta_no = #{searchKeyword} or m.obs_id = #{searchKeyword}
+		</if>
+		<if test="searchKeyword == '' ">
+			where sta_tmp1 like concat('%',#{searchKeyword2},'%') and sta_tmp1 not in('CJ')
+		</if>		
+		order by sta_no
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	
+	<select id="getStationMngInfoList" resultType="nms.system.vo.ObservatoryVO">
+		select
+			sta_no,          
+			net,             
+			obs_id,
+		    s1.etc as obs_desc,
+			obs_name,        
+			contractdate,    
+			completedate,    
+			price_contract,  
+			price_sw,        
+			price_hw,        
+			opendate,        
+			offdate,         
+			area,            
+			address,         
+			obs_kind,
+		    s2.codedesc as obs_kind_desc,
+			position,        
+			lon,             
+			lat,             
+			altitude,        
+			ground_ht,       
+			uground_ht,      
+			base, 
+		    s3.codedesc as base_desc,
+			str_cd,          
+		    s4.codedesc as str_cd_desc,
+			seis_cd,         
+		    s5.codedesc as seis_cd_desc,
+			ground,          
+		    s6.codedesc as ground_desc,
+			hole,            
+			seis_ds,         
+			design_acc,      
+			threshold_acc,  
+			build_floor,     
+			eq_area,         
+			hole_map,        
+			charge,          
+			contact,         
+			user_id,         
+			regdate,         
+			sta_type,        
+			sta_ip,          
+			sta_pic1,        
+			sta_pic2,        
+			sta_pic3,        
+			sta_pic4,        
+			sta_tmp1,        
+			sta_tmp2,        
+			sta_tmp3,
+			(select l_status from r_list s where m.sta_tmp2 = s.l_no ) as l_status
+		from seis_web.station_mng m
+		left join seis_web.code_desc s1 on s1.codeid=m.obs_id and s1.maincode='obs'
+		left join seis_web.code_desc s2 on s2.codeid=m.obs_kind and s2.maincode='faci'
+		left join seis_web.code_desc s3 on s3.codeid=m.base and s3.maincode='base'
+		left join seis_web.code_desc s4 on s4.codeid=m.str_cd and s4.maincode='str_cd'
+		left join seis_web.code_desc s5 on s5.codeid=m.seis_cd and s5.maincode='seis_cd'
+		left join seis_web.code_desc s6 on s6.codeid=m.ground and s6.maincode='ground'
+		left join seis_web.code_desc area on area.codeid=m.obs_id and area.maincode='area'	
+		<if test="searchKeyword != null and searchKeyword != ''">
+			where m.sta_tmp2 = #{searchKeyword}
+		</if>
+		order by sta_no
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	<select id="getStationLastInsertNo" resultType="int">
+		SELECT max(sta_no) as cnt from station
+	</select>
+	
+	<select id="getStationInfoListTotalCnt" resultType="int">
+		select
+			count(*) as cnt
+		from seis_web.station m
+		left join seis_web.code_desc s1 on s1.codeid=m.obs_id and s1.maincode='obs'
+		left join seis_web.code_desc s2 on s2.codeid=m.obs_kind and s2.maincode='faci'
+		left join seis_web.code_desc s3 on s3.codeid=m.base and s3.maincode='base'
+		left join seis_web.code_desc s4 on s4.codeid=m.str_cd and s4.maincode='str_cd'
+		left join seis_web.code_desc s5 on s5.codeid=m.seis_cd and s5.maincode='seis_cd'
+		left join seis_web.code_desc s6 on s6.codeid=m.ground and s6.maincode='ground'
+		left join seis_web.code_desc area on area.codeid=m.obs_id and area.maincode='area'	
+		<if test="searchKeyword != null and searchKeyword != ''">
+			where m.sta_no = #{searchKeyword} or m.obs_id = #{searchKeyword}
+		</if>		
+		<if test="searchKeyword == '' ">
+			where sta_tmp1 like concat('%',#{searchKeyword2},'%') and sta_tmp1 not in('CJ')
+		</if>	
+	</select>
+	<select id="getStationHistoryInfo" resultType="nms.system.vo.ObservatoryVO">
+		select
+			sh_no,
+			sta_no,          
+			net,             
+			obs_id,
+		    s1.etc as obs_desc,
+			obs_name,        
+			contractdate,    
+			completedate,    
+			price_contract,  
+			price_sw,        
+			price_hw,        
+			opendate,        
+			offdate,         
+			area,            
+			address,         
+			obs_kind,
+		    s2.codedesc as obs_kind_desc,
+			position,        
+			lon,             
+			lat,             
+			altitude,        
+			ground_ht,       
+			uground_ht,      
+			base, 
+		    s3.codedesc as base_desc,
+			str_cd,          
+		    s4.codedesc as str_cd_desc,
+			seis_cd,         
+		    s5.codedesc as seis_cd_desc,
+			ground,          
+		    s6.codedesc as ground_desc,
+			hole,            
+			seis_ds,         
+			design_acc,      
+			threshold_acc,  
+			build_floor,     
+			eq_area,         
+			hole_map,        
+			charge,          
+			contact,         
+			user_id,         
+			regdate,         
+			sta_type,        
+			sta_ip,          
+			sta_pic1,        
+			sta_pic2,        
+			sta_pic3,        
+			sta_pic4,        
+			sta_tmp1,        
+			sta_tmp2,        
+			sta_tmp3    
+		from seis_web.station_history m
+		left join seis_web.code_desc s1 on s1.codeid=m.obs_id and s1.maincode='obs'
+		left join seis_web.code_desc s2 on s2.codeid=m.obs_kind and s2.maincode='faci'
+		left join seis_web.code_desc s3 on s3.codeid=m.base and s3.maincode='base'
+		left join seis_web.code_desc s4 on s4.codeid=m.str_cd and s4.maincode='str_cd'
+		left join seis_web.code_desc s5 on s5.codeid=m.seis_cd and s5.maincode='seis_cd'
+		left join seis_web.code_desc s6 on s6.codeid=m.ground and s6.maincode='ground'
+		left join seis_web.code_desc area on area.codeid=m.obs_id and area.maincode='area'		
+		WHERE sh_no = #{searchKeyword}	
+	</select>
+	<select id="getStationMaintenanceList" resultType="nms.system.vo.ObservatoryVO">
+		select 
+			sta_tmp2
+			,sta_tmp3 
+		from station_history where sta_no = #{sta_no}
+		order by sta_tmp3 desc;
+	</select>
+	
+	
+	<select id="getStationHistoryList" resultType="nms.system.vo.ObservatoryVO">
+		select * from (
+			select
+				uni_no as sh_no,
+				a as obs_desc,
+				regdate,
+				(select obs_name from station s where s.sta_no = main.sta_no) as obs_name,
+				(select CASE sta_tmp1 WHEN 'NC' THEN '원전부지' ELSE CASE sta_tmp1 WHEN 'WP' THEN '수력발전' ELSE CASE sta_tmp1 WHEN 'CJ' THEN '천지발전' ELSE '양수발전' END END END from station s where s.sta_no = main.sta_no) as obs_kind,
+				uni_id as obs_id,
+				sta_tmp2,user_id
+			from (
+				 select sh_no as uni_no,'관측소' as a, regdate,sta_no,obs_id as uni_id,sta_tmp2,user_id from station_history
+				 union all
+				 select eh_no as uni_no,'센서' as a, regdate,sta_no,sen_id as uni_id ,sen_tmp1 as sta_tmp2,(select user_id from station s where sta_no = s.sta_no limit 0,1) as user_id from sensor_history
+				 union all
+				 select rh_no as uni_no,'기록계' as a, regdate,sta_no,rec_id as uni_id ,rec_tmp1 as sta_tmp2,(select user_id from station s where sta_no = s.sta_no limit 0,1) as user_id from recorder_history
+			 ) main
+			 order by regdate desc,a, sh_no
+		) top
+		where date_format(regdate,'%Y-%m-%d') between #{startDate} and #{endDate} and sta_tmp2 in ('최초입력','수정')
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	<select id="getStationHistoryInfoListTotalCnt" resultType="int">
+		select count(*) as cnt from (
+			select
+				uni_no as sh_no,
+				a as obs_desc,
+				regdate,
+				(select obs_name from station s where s.sta_no = main.sta_no) as obs_name,
+				(select CASE sta_tmp1 WHEN 'NC' THEN '원전부지' ELSE CASE sta_tmp1 WHEN 'WP' THEN '수력발전' ELSE CASE sta_tmp1 WHEN 'CJ' THEN '천지발전' ELSE '양수발전' END END END from station s where s.sta_no = main.sta_no) as obs_kind,
+				uni_id as obs_id,
+				sta_tmp2
+			from (
+				 select sh_no as uni_no,'관측소' as a, regdate,sta_no,obs_id as uni_id,sta_tmp2 from station_history
+				 union all
+				 select eh_no as uni_no,'센서' as a, regdate,sta_no,sen_id as uni_id ,sen_tmp1 as sta_tmp2 from sensor_history
+				 union all
+				 select rh_no as uni_no,'기록계' as a, regdate,sta_no,rec_id as uni_id ,rec_tmp1 as sta_tmp2 from recorder_history
+			 ) main
+			 order by regdate desc
+		) top	
+		where date_format(regdate,'%Y-%m-%d') between #{startDate} and #{endDate} and sta_tmp2 in ('최초입력','수정')
+	</select>	
+	<insert id="insertStation">
+		INSERT INTO seis_web.station values(
+			0,#{net},#{obs_id},#{obs_name},#{contractdate},#{completedate},    
+			#{price_contract},#{price_sw}, #{price_hw},#{opendate},#{offdate},         
+			#{area},#{address}, #{obs_kind},#{position},#{lon},#{lat},#{altitude},        
+			#{ground_ht},#{uground_ht},#{base}, #{str_cd},#{seis_cd}, #{ground},          
+			#{hole}, #{seis_ds}, #{design_acc},#{threshold_acc},#{build_floor},     
+			#{eq_area}, #{hole_map},#{charge}, #{contact}, #{user_id},now(),         
+			#{sta_type}, #{sta_ip},#{sta_pic1}, #{sta_pic2}, #{sta_pic3}, #{sta_pic4},        
+			#{sta_tmp1}, #{sta_tmp2}, #{sta_tmp3}	)
+	</insert>
+	
+	<insert id="insertStationMaintenance">
+		INSERT INTO station_history
+		SELECT 
+			0,sta_no, net, obs_id, obs_name, contractdate, completedate, price_contract, price_sw, price_hw, opendate, offdate, 
+			area, address, obs_kind, position, lon, lat, altitude, ground_ht, uground_ht, base, str_cd, seis_cd, ground, hole, 
+			seis_ds, design_acc, threshold_acc, build_floor, eq_area, hole_map, charge, contact, user_id, now(), sta_type, 
+			sta_ip, sta_pic1, sta_pic2, sta_pic3, sta_pic4, sta_tmp1, #{msg}, #{date}
+		FROM station 
+		WHERE sta_no = #{no};	
+	</insert>
+	
+	<update id="updateStation">
+		UPDATE seis_web.station SET
+			net = #{net}, obs_id = #{obs_id}, obs_name = #{obs_name}, contractdate =#{contractdate }, completedate = #{completedate},
+			price_contract = #{price_contract},price_sw = #{price_sw},price_hw =  #{price_hw},opendate = #{opendate},offdate = #{offdate},         
+			area = #{area},address = #{address}, obs_kind = #{obs_kind},position = #{position},lon = #{lon},lat = #{lat},altitude = #{altitude},        
+			ground_ht = #{ground_ht},uground_ht = #{uground_ht},base = #{base}, str_cd = #{str_cd},seis_cd = #{seis_cd}, ground = #{ground},          
+			hole = #{hole}, seis_ds = #{seis_ds}, design_acc = #{design_acc},threshold_acc = #{threshold_acc},build_floor = #{build_floor},     
+			eq_area = #{eq_area}, hole_map = #{hole_map},charge = #{charge}, contact = #{contact}, user_id = #{user_id},         
+			sta_type = #{sta_type}, sta_ip = #{sta_ip},sta_tmp1 = #{sta_tmp1}
+		WHERE sta_no = #{sta_no}
+	</update>
+	
+	<update id="updateReportStation">
+		UPDATE seis_web.station_mng SET
+			net = #{net}, obs_id = #{obs_id}, obs_name = #{obs_name}, contractdate =#{contractdate }, completedate = #{completedate},
+			price_contract = #{price_contract},price_sw = #{price_sw},price_hw =  #{price_hw},opendate = #{opendate},offdate = #{offdate},         
+			area = #{area},address = #{address}, obs_kind = #{obs_kind},position = #{position},lon = #{lon},lat = #{lat},altitude = #{altitude},        
+			ground_ht = #{ground_ht},uground_ht = #{uground_ht},base = #{base}, str_cd = #{str_cd},seis_cd = #{seis_cd}, ground = #{ground},          
+			hole = #{hole}, seis_ds = #{seis_ds}, design_acc = #{design_acc},threshold_acc = #{threshold_acc},build_floor = #{build_floor},     
+			eq_area = #{eq_area}, hole_map = #{hole_map},charge = #{charge}, contact = #{contact}, user_id = #{user_id},         
+			sta_type = #{sta_type}, sta_ip = #{sta_ip},sta_tmp1 = #{sta_tmp1}
+		WHERE sta_no = #{sta_no}
+	</update>	
+	
+	
+<!-- 	트리거, 테이블관련 -->
+	<select id="createTriggerLevelTable">
+        
+        CREATE TABLE ${tableName} (
+			tr_no INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            tr_local_1 varchar(3),
+            tr_local_2 varchar(3),
+            tr_local_3 varchar(3),
+            tr_local_dat varchar(3),
+            tr_kiss_1 varchar(3),
+            tr_kiss_2 varchar(3),
+            tr_kiss_dat varchar(3),
+            tr_chan varchar(3),
+            tr_tmp1 varchar(20),
+            tr_tmp2 varchar(20),
+            tr_tmp3 varchar(20)
+        )		
+	</select>
+</mapper>

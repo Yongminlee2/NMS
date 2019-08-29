@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.LogMapper">
+	<select id="getLogList" resultType="nms.system.vo.LogVO">
+		SELECT
+			l_no,
+			(select l_type_name from log_type_info s where s.l_type_code = m.l_type) as l_type,
+			l_date,
+			(select l_id_name from log_id_info s where s.l_id_code = m.l_log_id) as l_log_id,
+			l_text,
+			l_tmp1,
+			l_tmp2,
+			l_tmp3		
+		FROM log_info m
+		WHERE date_format(l_date,'%Y-%m-%d') between #{startDate} and #{endDate}
+		and l_type like concat('%',#{searchKeyword},'%')
+		and l_log_id like concat('%',#{searchKeyword2},'%')
+		order by l_no desc
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	<select id="getLogListTotalCnt" resultType="int">
+		SELECT
+			count(*) as cnt
+		FROM log_info m
+		WHERE date_format(l_date,'%Y-%m-%d') between #{startDate} and #{endDate}
+		and l_type like concat('%',#{searchKeyword},'%')
+		and l_log_id like concat('%',#{searchKeyword2},'%')
+	</select>	
+	
+	<select id="getLogIdList" resultType="nms.system.vo.LogVO">
+		SELECT
+			l_no,
+			l_id_code as l_type,
+			l_id_name as l_name
+		FROM log_id_info
+<!-- 		<if test="switchKey == 'mody'"> -->
+<!-- 			limit #{startRow},#{rowsPerPage} -->
+<!-- 		</if> -->
+	</select>
+	<select id="getLogIdListTotalCnt" resultType="int">
+		SELECT
+			count(*) as cnt
+		FROM log_id_info m
+	</select>		
+	<select id="getLogTypeList" resultType="nms.system.vo.LogVO">
+		SELECT
+			l_no,
+			l_type_code as l_type,
+			l_type_name as l_name
+		FROM log_type_info
+<!-- 		<if test="switchKey == 'mody'"> -->
+<!-- 			limit #{startRow},#{rowsPerPage} -->
+<!-- 		</if>		 -->
+	</select>
+	<select id="getLogTypeListTotalCnt" resultType="int">
+		SELECT
+			count(*) as cnt
+		FROM log_id_info m
+	</select>	
+		
+	<insert id="insertLogId">
+		INSERT INTO log_id_info values (
+			0,#{l_type},#{l_name},'','',''
+		)
+	</insert>
+	<insert id="insertLogType">
+		INSERT INTO log_type_info values (
+			0,#{l_type},#{l_name},'','',''
+		)
+	</insert>	
+	
+	<update id="updateLogId">
+		UPDATE log_id_info SET l_id_code = #{l_type}, l_id_name = #{l_name} WHERE l_no = #{l_no}
+	</update>
+	<update id="updateLogType">
+		UPDATE log_type_info SET l_type_code = #{l_type}, l_type_name = #{l_name} WHERE l_no = #{l_no}
+	</update>
+	
+	<delete id="deleteLogId">
+		DELETE FROM log_id_info WHERE l_no = #{l_no}
+	</delete>
+	<delete id="deleteLogType">
+		DELETE FROM log_type_info WHERE l_no = #{l_no}
+	</delete>
+</mapper>

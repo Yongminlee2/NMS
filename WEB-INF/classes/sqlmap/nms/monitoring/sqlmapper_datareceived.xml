@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.monitoring.mapper.DatareceivedMapper">
+
+	<resultMap id = "result_table_data_nf" type = "nms.monitoring.vo.DataReceviedTableDataVO" >
+		<result property = "tablename" column = "tablename"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "color" column = "color"/>
+		<result property = "maptype" column = "maptype"/>
+	</resultMap>
+	
+	<resultMap id = "result_table_data_hp" type = "nms.monitoring.vo.DataReceviedTableDataVO">
+		<result property = "tablename" column = "tablename"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "color" column = "color"/>
+		<result property = "maptype" column = "maptype"/>
+	</resultMap>
+	
+	<resultMap id = "result_table_data_ps" type = "nms.monitoring.vo.DataReceviedTableDataVO">
+		<result property = "tablename" column = "tablename"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "color" column = "color"/>
+		<result property = "maptype" column = "maptype"/>
+	</resultMap>
+	
+	<resultMap id = "result_table_data_go" type = "nms.monitoring.vo.DataReceviedTableDataVO">
+		<result property = "tablename" column = "tablename"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "color" column = "color"/>
+		<result property = "maptype" column = "maptype"/>
+	</resultMap>
+	
+	<resultMap id = "result_table_data_cj" type = "nms.monitoring.vo.DataReceviedTableDataVO">
+		<result property = "tablename" column = "tablename"/>
+		<result property = "epochtime" column = "st_epochtime"/>
+		<result property = "color" column = "color"/>
+		<result property = "maptype" column = "maptype"/>
+	</resultMap>
+
+
+	<select id="receviedTableDatas" resultMap = "result_table_data_nf, result_table_data_hp, result_table_data_ps, result_table_data_go, result_table_data_cj" statementType="CALLABLE" >
+		{Call SP_TABLE_DATA()}
+	</select>
+	
+	<select id="stationDetail" parameterType="java.lang.String" resultType="nms.monitoring.vo.DataReceivedStationInfo">
+		select 
+			a.net,
+			(select codeDesc from code_desc where mainCode = 'net' and codeId = a.net) as net_name, 
+			a.obs_id, 
+			a.obs_name, 
+			(select codeDesc from code_desc where mainCode = 'obs_kind' and codeId = a.sta_tmp1) as sta_tmp1, 
+			a.lon, a.lat, 
+			a.address, 
+			b.sen_location, 
+			b.sen_model, 
+			b.sen_company, 
+			b.sen_serial, 
+			c.rec_id, 
+			c.rec_company, 
+			c.rec_model, 
+			c.rec_serial,
+			concat(a.obs_id, b.sen_location, '_ZOOMIN_MAP.png') as img_url
+			from station a
+				inner join sensor b on (a.sta_no = b.sta_no and b.sen_location = 'G')
+				inner join recorder c on (a.obs_id = c.obs_id)
+					where a.obs_id = #{sta_code} limit 1;
+	</select>
+</mapper>

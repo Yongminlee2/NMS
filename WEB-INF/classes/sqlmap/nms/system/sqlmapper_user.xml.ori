@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nms.system.mapper.UserMapper">
+
+	<resultMap id="result_user_info" type="nms.system.vo.UserInfoVO" >
+		<result property="id"         column="user_id"         />
+		<result property="pw"         column="user_pw"         />
+		<result property="name"       column="user_name"       />
+		<result property="org"        column="user_org"        />
+		<result property="org2"       column="user_org2"        />
+		<result property="department" column="user_department" />
+		<result property="duty"       column="user_duty"       />
+		<result property="tel"        column="user_tel"        />
+		<result property="email"      column="user_email"      />
+		<result property="auth"       column="user_auth"       />
+		<result property="update"     column="user_update"     />
+		<result property="start"      column="user_start"      />
+		<result property="last"       column="user_last"       />
+		<result property="tmp1"       column="user_tmp1"       />
+		<result property="tmp2"       column="user_tmp2"       />
+		<result property="tmp3"       column="user_tmp3"       />
+	</resultMap>
+	
+	<select id="getUserList" resultMap="result_user_info">
+		SELECT	
+			user_id,
+			user_pw,
+			user_name,
+			CASE user_org WHEN 'NC' THEN '원전' ELSE CASE user_org WHEN 'WP' THEN '수력' ELSE '양수' END END as user_org,
+			user_org as user_org2,
+			user_department,
+			user_duty,
+			user_tel,
+			user_email,
+			user_auth,
+			user_update,
+			user_start,
+			user_last,
+			user_tmp1,
+			user_tmp2,
+			user_tmp3		
+		FROM user m
+		where m.user_id like concat('%',#{searchKeyword},'%') and m.user_name like concat('%',#{searchKeyword2},'%') and m.user_tmp1 like concat('%' #{switchKey}, '%')
+		order by user_start desc
+		limit #{startRow},#{rowsPerPage}
+	</select>
+	<select id="sendMailMember" resultType="nms.system.vo.UserInfoVO">
+		select user_email as email,user_id as id from user where user_tmp1 = 'y' and user_tmp2 = 'y' and user_org in(#{type},'AL')
+	</select>
+	<select id="getUserListTotalCnt" resultType="int">
+		SELECT	
+			count(*) as cnt	
+		FROM user m
+		where m.user_id like concat('%',#{searchKeyword},'%') and m.user_name like concat('%',#{searchKeyword2},'%') and m.user_tmp1 like concat('%' #{switchKey}, '%')
+
+	</select>
+	<select id="checkId" resultType="int">
+		SELECT count(*) FROM seis_web.user where user_id=#{id}
+	</select>
+	
+	<select id="checkEventSendLog" resultType="int">
+		select count(*) from event_send_log where e_evt_id = #{id}	and e_user_id = #{user_id}
+	</select>
+	<insert id="insertEventSendLog">
+		insert into event_send_log values(0,#{user_id},0,date_format(now(),'%Y-%m-%d'),1,date_format(now(),'%Y-%m-%d'),#{type},#{id},'','','');
+	</insert>
+	<update id="updateEventSendLog">
+		update event_send_log set e_mail_flag = 1 , e_mail_time = date_format(now(),'%Y-%m-%d') where e_evt_id = #{id} and e_user_id = #{user_id}
+	</update>
+	<insert id="insertMember">
+		INSERT INTO user values(
+			#{id},
+			#{pw},
+			#{name},
+			#{org},
+			#{department},
+			#{duty},
+			#{tel},
+			#{email},
+			#{auth},
+			now(),
+			now(),
+			now(),
+			#{tmp1},
+			#{tmp2},
+			#{tmp3}			
+		)
+	</insert>
+	<update id="updateMember">
+		UPDATE user SET 
+			<if test="pw != null and pw != ''">
+				user_pw 		= #{pw},
+			</if>
+			user_name		= #{name},
+			user_org		= #{org},
+			user_department	= #{department},	
+			user_duty		= #{duty},
+			user_tel		= #{tel},
+			user_email		= #{email},
+			user_auth		= #{auth},
+			user_update			= now(),
+			user_tmp2 = #{tmp2},
+			user_tmp3 = #{tmp3}
+		WHERE user_id = #{id}
+	</update>
+	
+	<update id="acceptJoinMember">
+		UPDATE user SET 
+			user_tmp1 = 'y'
+		WHERE user_id = #{id}
+	</update>
+	
+	<delete id="deleteMember" parameterType="string">
+		DELETE FROM user WHERE user_id = #{id}
+	</delete>
+	
+	
+</mapper>

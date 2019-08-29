@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+				http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- 파일 다운로드 설정 -->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="0" />
+	</bean>
+	
+	<bean id="download" class="nms.util.FileDownloadView"></bean>
+	<bean id="exportExcel" class="nms.util.ExcelView"></bean>
+	<bean id="exportExcelDataCollRate" class="nms.util.ExcelViewDataCollRate"></bean>
+	<bean id="exportExcelReport" class="nms.util.ExcelViewReport"></bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+	
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:/message/message-common</value>
+				<value>classpath:/props/globals</value>
+			</list>
+		</property>
+		<property name="defaultEncoding">
+			<value>UTF-8</value>
+		</property>
+		<property name="cacheSeconds">
+			<value>60</value>
+		</property>
+	</bean>
+	
+	<bean id="messageSourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
+		<constructor-arg ref="messageSource"/>
+	</bean>
+	
+	<!-- <bean id="fileUploadRootFolder" class="java.lang.String">
+		<constructor-arg value="D:\SIS-Data\UploadData\" type="String" index="0"></constructor-arg>
+	</bean> -->
+</beans>
